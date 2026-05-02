@@ -54,13 +54,14 @@ export default function InventoryClient() {
   const [activeTab, setActiveTab] = useState<"stock" | "relations">("stock");
   const [userProfile, setUserProfile] = useState<any>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Form states
   const [isAddingStock, setIsAddingStock] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [stockForm, setStockForm] = useState({
-    name: "", category: "Consumables", stock_quantity: 0,
-    min_threshold: 5, unit: "pcs", price_per_unit: 0
+  const [stockForm, setStockForm] = useState<any>({
+    name: "", category: "Consumables", stock_quantity: "",
+    min_threshold: 5, unit: "pcs", price_per_unit: ""
   });
 
   const [isAddingLink, setIsAddingLink] = useState(false);
@@ -141,7 +142,22 @@ export default function InventoryClient() {
   const resetStockForm = () => {
     setIsAddingStock(false);
     setEditingId(null);
-    setStockForm({ name: "", category: "Consumables", stock_quantity: 0, min_threshold: 5, unit: "pcs", price_per_unit: 0 });
+    setStockForm({ name: "", category: "Consumables", stock_quantity: "", min_threshold: 5, unit: "pcs", price_per_unit: "" });
+  };
+
+  const handleNameChange = (val: string) => {
+    const updatedForm = { ...stockForm, name: val };
+    
+    // Auto-fill logic from existing database items
+    const existingItem = items.find(i => i.name === val);
+    if (existingItem) {
+      updatedForm.category = existingItem.category;
+      updatedForm.unit = existingItem.unit;
+      updatedForm.min_threshold = existingItem.min_threshold;
+      updatedForm.price_per_unit = existingItem.price_per_unit;
+    }
+    
+    setStockForm(updatedForm);
   };
 
   if (loading && items.length === 0) return <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA]"><Loader2 className="animate-spin text-slate-900" size={40} /></div>;
@@ -150,12 +166,17 @@ export default function InventoryClient() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row font-sans text-slate-900">
-      {/* SHARED PREMIUM SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex-col z-50 hidden lg:flex">
+      {/* SIDEBAR - SHARED REFACTORED */}
+      <aside className={`fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex flex-col z-50 transition-all duration-500 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}`}>
         <div className="p-10 flex flex-col grow">
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg"><Sparkles size={20} /></div>
-            <span className="text-2xl font-serif font-black tracking-tighter">SERENE</span>
+          <div className="flex justify-between items-center mb-12">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+                <Sparkles size={20} />
+              </div>
+              <span className="text-2xl font-serif font-black tracking-tighter text-slate-900">SERENE</span>
+            </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-400 hover:text-slate-900"><X size={24} /></button>
           </div>
 
           <nav className="space-y-1.5 mb-10">
@@ -178,9 +199,9 @@ export default function InventoryClient() {
           <div className="mt-auto">
              <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
                 <div className="flex items-center gap-4">
-                   <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold group-hover:bg-slate-800 transition-all">{userProfile?.full_name?.[0]}</div>
+                   <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-900 group-hover:bg-slate-800 group-hover:text-white group-hover:border-transparent transition-all">{userProfile?.full_name?.[0]}</div>
                    <div>
-                      <p className="text-xs font-black group-hover:text-white transition-colors uppercase tracking-widest">{userProfile?.full_name}</p>
+                      <p className="text-xs font-black text-slate-900 group-hover:text-white transition-colors uppercase tracking-widest">{userProfile?.full_name}</p>
                       <p className="text-[10px] font-bold text-slate-400 group-hover:text-slate-500 transition-colors uppercase tracking-widest">{userProfile?.role}</p>
                    </div>
                 </div>
@@ -199,13 +220,15 @@ export default function InventoryClient() {
                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.25em]">Warehouse & Clinical Materials</p>
             </div>
             
-            <div className="flex items-center gap-4">
-               <Link href="/admin/inventory/report" className="bg-white border border-slate-100 text-slate-900 px-8 py-4 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 shadow-sm hover:bg-slate-50 transition-all">
+            <div className="flex flex-wrap items-center gap-4">
+               <Link href="/admin/inventory/report" className="hidden sm:flex bg-white border border-slate-100 text-slate-900 px-8 py-4 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] items-center gap-2 shadow-sm hover:bg-slate-50 transition-all">
                   <Archive size={16} /> Export
                </Link>
-               <button onClick={() => activeTab === "stock" ? setIsAddingStock(true) : setIsAddingLink(true)} className="bg-slate-900 text-white px-10 py-4 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">
+               <button onClick={() => activeTab === "stock" ? setIsAddingStock(true) : setIsAddingLink(true)} className="bg-slate-900 text-white px-8 lg:px-10 py-4 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all shrink-0">
                   <Plus size={18} /> {activeTab === "stock" ? "New Item" : "New Relation"}
                </button>
+               <button onClick={async () => { await supabase.auth.signOut(); router.push("/login"); }} className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-red-500 hover:bg-red-50 transition-all"><LogOut size={20}/></button>
+               <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-900"><Layers size={20}/></button>
             </div>
         </header>
 
@@ -228,92 +251,142 @@ export default function InventoryClient() {
 
         <AnimatePresence mode="wait">
           {activeTab === "stock" ? (
-             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} key="stock" className="bg-white rounded-5xl border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden overflow-x-auto">
-               <table className="w-full text-left min-w-[1000px]">
-                  <thead className="bg-slate-50/50 border-b border-slate-100">
-                     <tr>
-                        <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Inventory Item</th>
-                        <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Status & Stock</th>
-                        <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Inventory Value</th>
-                        <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 text-right">Actions</th>
-                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                     {items.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50/30 transition-all text-sm group">
-                           <td className="px-10 py-8">
-                              <p className="font-black text-slate-900 text-base mb-1">{item.name}</p>
-                              <p className="text-[9px] font-black text-primary bg-primary/5 w-fit px-3 py-1 rounded-full uppercase tracking-widest">{item.category}</p>
-                           </td>
-                           <td className="px-10 py-8">
-                              <div className="flex items-center gap-3">
-                                 <div className={`w-2.5 h-2.5 rounded-full ${item.stock_quantity > item.min_threshold ? 'bg-emerald-500' : 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
-                                 <span className={`font-black ${item.stock_quantity <= item.min_threshold ? 'text-red-600' : 'text-slate-700'}`}>{item.stock_quantity} {item.unit}</span>
-                                 <span className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">/ Min {item.min_threshold}</span>
-                              </div>
-                           </td>
-                           <td className="px-10 py-8">
-                              <p className="text-sm font-black text-slate-900">Rp {(item.stock_quantity * item.price_per_unit).toLocaleString('id-ID')}</p>
-                              <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Rate: Rp {item.price_per_unit.toLocaleString('id-ID')}</p>
-                           </td>
-                           <td className="px-10 py-8 text-right">
-                              <div className="flex justify-end gap-2">
-                                 <button onClick={() => { setEditingId(item.id); setStockForm({...item}); setIsAddingStock(true); }} className="p-4 text-slate-300 hover:text-slate-900 transition-all"><Edit2 size={20}/></button>
-                                 <button onClick={() => setDeleteTarget({ id: item.id, type: 'stock' })} className="p-4 text-slate-300 hover:text-red-500 transition-all"><Trash2 size={20}/></button>
-                              </div>
-                           </td>
-                        </tr>
-                     ))}
-                  </tbody>
-               </table>
-            </motion.div>
-          ) : (
-             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} key="relations" className="space-y-8">
-               <div className="p-8 bg-blue-50/50 rounded-4xl border border-blue-100/50 flex items-start gap-5">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-500 shadow-sm"><RefreshCw size={24} className="animate-spin-slow" /></div>
-                  <div>
-                     <p className="text-sm font-black text-blue-900 uppercase tracking-widest mb-1">Clinical Automation Logic</p>
-                     <p className="text-xs text-blue-700 leading-relaxed max-w-2xl font-medium">These relations govern automatic stock depletion. When a treatment phase concludes at the dashboard, the linked materials will be deducted from warehouse inventory automatically.</p>
-                  </div>
-               </div>
+             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} key="stock">
+                {/* DESKTOP TABLE */}
+                <div className="hidden lg:block bg-white rounded-5xl border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden">
+                   <table className="w-full text-left">
+                      <thead className="bg-slate-50/50 border-b border-slate-100">
+                         <tr>
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Inventory Item</th>
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Status & Stock</th>
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Inventory Value</th>
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 text-right">Actions</th>
+                         </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                         {items.map((item) => (
+                            <tr key={item.id} className="hover:bg-slate-50/30 transition-all text-sm group">
+                               <td className="px-10 py-8">
+                                  <p className="font-black text-slate-900 text-base mb-1">{item.name}</p>
+                                  <p className="text-[9px] font-black text-primary bg-primary/5 w-fit px-3 py-1 rounded-full uppercase tracking-widest">{item.category}</p>
+                               </td>
+                               <td className="px-10 py-8">
+                                  <div className="flex items-center gap-3">
+                                     <div className={`w-2.5 h-2.5 rounded-full ${item.stock_quantity > item.min_threshold ? 'bg-emerald-500' : 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
+                                     <span className={`font-black ${item.stock_quantity <= item.min_threshold ? 'text-red-600' : 'text-slate-700'}`}>{item.stock_quantity} {item.unit}</span>
+                                     <span className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">/ Min {item.min_threshold}</span>
+                                  </div>
+                               </td>
+                               <td className="px-10 py-8">
+                                  <p className="text-sm font-black text-slate-900">Rp {((Number(item.stock_quantity)||0) * (Number(item.price_per_unit)||0)).toLocaleString('id-ID')}</p>
+                                  <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Rate: Rp {Number(item.price_per_unit).toLocaleString('id-ID')}</p>
+                               </td>
+                               <td className="px-10 py-8 text-right">
+                                  <div className="flex justify-end gap-2">
+                                     <button onClick={() => { setEditingId(item.id); setStockForm({...item}); setIsAddingStock(true); }} className="p-4 text-slate-300 hover:text-slate-900 transition-all"><Edit2 size={20}/></button>
+                                     <button onClick={() => setDeleteTarget({ id: item.id, type: 'stock' })} className="p-4 text-slate-300 hover:text-red-500 transition-all"><Trash2 size={20}/></button>
+                                  </div>
+                               </td>
+                            </tr>
+                         ))}
+                      </tbody>
+                   </table>
+                </div>
 
-                <div className="bg-white rounded-5xl border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden overflow-x-auto">
-                  <table className="w-full text-left min-w-[800px]">
-                     <thead>
-                        <tr className="bg-slate-50/50 border-b border-slate-100">
-                           <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Clinical Service</th>
-                           <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Material Linked</th>
-                           <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Consumption Rate</th>
-                           <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 text-right">Actions</th>
-                        </tr>
-                     </thead>
-                     <tbody className="divide-y divide-slate-50">
-                        {links.map((link) => (
-                           <tr key={link.id} className="hover:bg-slate-50/30 transition-all text-sm group">
-                              <td className="px-10 py-8">
-                                 <p className="font-black text-slate-900 text-base">{link.services?.name}</p>
-                              </td>
-                              <td className="px-10 py-8">
-                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:text-primary transition-colors"><Layers size={20}/></div>
-                                    <p className="font-black text-slate-900">{link.inventory?.name}</p>
-                                 </div>
-                              </td>
-                              <td className="px-10 py-8">
-                                 <div className="bg-slate-50 px-5 py-2 rounded-2xl border border-slate-100 w-fit">
-                                    <span className="text-primary font-black text-sm">{link.qty_per_treatment}</span>
-                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-2">{link.unit || link.inventory?.unit}</span>
-                                 </div>
-                              </td>
-                              <td className="px-10 py-8 text-right">
-                                 <button onClick={() => setDeleteTarget({ id: link.id, type: 'relation' })} className="p-4 text-slate-300 hover:text-red-500 transition-all"><Trash2 size={20}/></button>
-                              </td>
-                           </tr>
-                        ))}
-                     </tbody>
-                  </table>
-               </div>
-            </motion.div>
+                {/* MOBILE CARDS */}
+                <div className="lg:hidden space-y-4">
+                   {items.map((item) => (
+                      <div key={item.id} className="bg-white p-6 rounded-4xl border border-slate-100 shadow-sm space-y-4">
+                         <div className="flex justify-between items-start">
+                            <div>
+                               <p className="font-black text-slate-900 text-lg mb-1">{item.name}</p>
+                               <p className="text-[9px] font-black text-primary bg-primary/5 w-fit px-3 py-1 rounded-full uppercase tracking-widest">{item.category}</p>
+                            </div>
+                            <div className="flex gap-1">
+                               <button onClick={() => { setEditingId(item.id); setStockForm({...item}); setIsAddingStock(true); }} className="p-3 text-slate-400"><Edit2 size={18}/></button>
+                               <button onClick={() => setDeleteTarget({ id: item.id, type: 'stock' })} className="p-3 text-slate-400"><Trash2 size={18}/></button>
+                            </div>
+                         </div>
+                         <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
+                            <div className="flex items-center gap-3">
+                               <div className={`w-2 h-2 rounded-full ${item.stock_quantity > item.min_threshold ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'}`} />
+                               <span className={`text-sm font-black ${item.stock_quantity <= item.min_threshold ? 'text-red-600' : 'text-slate-700'}`}>{item.stock_quantity} {item.unit}</span>
+                            </div>
+                            <p className="text-xs font-black text-slate-900 text-right">Rp {((Number(item.stock_quantity)||0) * (Number(item.price_per_unit)||0)).toLocaleString('id-ID')}</p>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </motion.div>
+          ) : (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} key="relations" className="space-y-8">
+                <div className="p-8 bg-blue-50/50 rounded-4xl border border-blue-100/50 flex flex-col md:flex-row items-start gap-5">
+                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-500 shadow-sm shrink-0"><RefreshCw size={24} className="animate-spin-slow" /></div>
+                   <div>
+                      <p className="text-sm font-black text-blue-900 uppercase tracking-widest mb-1">Clinical Automation Logic</p>
+                      <p className="text-xs text-blue-700 leading-relaxed max-w-2xl font-medium">These relations govern automatic stock depletion. When a treatment phase concludes at the dashboard, the linked materials will be deducted from warehouse inventory automatically.</p>
+                   </div>
+                </div>
+
+                 <div className="hidden lg:block bg-white rounded-5xl border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden">
+                   <table className="w-full text-left">
+                      <thead>
+                         <tr className="bg-slate-50/50 border-b border-slate-100">
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Clinical Service</th>
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Material Linked</th>
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Consumption Rate</th>
+                            <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 text-right">Actions</th>
+                         </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                         {links.map((link) => (
+                            <tr key={link.id} className="hover:bg-slate-50/30 transition-all text-sm group">
+                               <td className="px-10 py-8">
+                                  <p className="font-black text-slate-900 text-base">{link.services?.name}</p>
+                               </td>
+                               <td className="px-10 py-8">
+                                  <div className="flex items-center gap-3">
+                                     <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:text-primary transition-colors"><Layers size={20}/></div>
+                                     <p className="font-black text-slate-900">{link.inventory?.name}</p>
+                                  </div>
+                               </td>
+                               <td className="px-10 py-8">
+                                  <div className="bg-slate-50 px-5 py-2 rounded-2xl border border-slate-100 w-fit">
+                                     <span className="text-primary font-black text-sm">{link.qty_per_treatment}</span>
+                                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-2">{link.unit || link.inventory?.unit}</span>
+                                  </div>
+                               </td>
+                               <td className="px-10 py-8 text-right">
+                                  <button onClick={() => setDeleteTarget({ id: link.id, type: 'relation' })} className="p-4 text-slate-300 hover:text-red-500 transition-all"><Trash2 size={20}/></button>
+                               </td>
+                            </tr>
+                         ))}
+                      </tbody>
+                   </table>
+                </div>
+
+                <div className="lg:hidden space-y-4">
+                   {links.map((link) => (
+                      <div key={link.id} className="bg-white p-6 rounded-4xl border border-slate-100 shadow-sm space-y-6">
+                         <div className="flex justify-between items-start">
+                            <p className="font-black text-slate-900 text-base leading-tight pr-4">{link.services?.name}</p>
+                            <button onClick={() => setDeleteTarget({ id: link.id, type: 'relation' })} className="p-3 text-slate-400"><Trash2 size={18}/></button>
+                         </div>
+                         <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
+                            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400"><Layers size={18}/></div>
+                            <div className="grow">
+                               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Deducts Material</p>
+                               <p className="text-xs font-black text-slate-900">{link.inventory?.name}</p>
+                            </div>
+                            <div className="text-right">
+                               <p className="text-sm font-black text-primary">{link.qty_per_treatment}</p>
+                               <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{link.unit || link.inventory?.unit}</p>
+                            </div>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </motion.div>
           )}
         </AnimatePresence>
 
@@ -322,30 +395,35 @@ export default function InventoryClient() {
            {isAddingStock && (
              <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetStockForm} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
-                <motion.div initial={{ opacity: 0, y: 100, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 100, scale: 0.9 }} className="relative w-full max-w-2xl bg-white rounded-[56px] shadow-2xl p-16 overflow-y-auto max-h-[90vh]">
-                   <div className="flex justify-between items-center mb-12">
-                      <h2 className="font-serif text-4xl text-slate-900">{editingId ? "Refine Item" : "New Material Entry"}</h2>
+                 <motion.div initial={{ opacity: 0, y: 100, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 100, scale: 0.9 }} className="relative w-full max-w-lg bg-white rounded-[48px] shadow-2xl p-10 lg:p-12 overflow-y-auto max-h-[90vh]">
+                    <div className="flex justify-between items-center mb-10">
+                       <h2 className="font-serif text-3xl text-slate-900">{editingId ? "Refine Item" : "New Material Entry"}</h2>
                       <button onClick={resetStockForm} className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-red-500 transition-all"><X size={24}/></button>
                    </div>
-                   <div className="space-y-8">
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Item Identity</label>
-                          <input type="text" value={stockForm.name} onChange={e => setStockForm({...stockForm, name: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="e.g. Clinical Serum-X" />
-                       </div>
-                       <div className="grid grid-cols-2 gap-6">
-                          <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Category</label><select value={stockForm.category} onChange={e => setStockForm({...stockForm, category: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black appearance-none"><option>Skincare</option><option>Tools</option><option>Consumables</option><option>Supplies</option></select></div>
-                          <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Unit Type</label><input type="text" value={stockForm.unit} onChange={e => setStockForm({...stockForm, unit: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="pcs / ml" /></div>
-                       </div>
-                       <div className="grid grid-cols-2 gap-6">
-                          <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">{editingId ? "Adjust Qty" : "Initial Qty"}</label><input type="number" value={stockForm.stock_quantity} onChange={e => setStockForm({...stockForm, stock_quantity: parseFloat(e.target.value) || 0})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
-                          <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Safety Level</label><input type="number" value={stockForm.min_threshold} onChange={e => setStockForm({...stockForm, min_threshold: parseFloat(e.target.value) || 0})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
-                       </div>
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Unit Cost (IDR)</label>
-                          <input type="number" value={stockForm.price_per_unit} onChange={e => setStockForm({...stockForm, price_per_unit: parseInt(e.target.value) || 0})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" />
-                       </div>
-                      <button onClick={handleSaveStock} className="w-full bg-slate-900 text-white py-6 rounded-[28px] font-black uppercase tracking-[0.25em] text-[10px] flex items-center justify-center gap-3 shadow-2xl shadow-slate-200 hover:scale-[1.02] active:scale-95 transition-all"><Save size={18} /> Finalize Inventory Update</button>
-                   </div>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Item Identity</label>
+                           <input type="text" list="material-suggestions" value={stockForm.name} onChange={e => handleNameChange(e.target.value)} className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="e.g. Clinical Serum-X" />
+                           <datalist id="material-suggestions">
+                              {items.map(item => (
+                                 <option key={item.id} value={item.name} />
+                              ))}
+                           </datalist>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Category</label><select value={stockForm.category} onChange={e => setStockForm({...stockForm, category: e.target.value})} className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black appearance-none"><option>Skincare</option><option>Tools</option><option>Consumables</option><option>Supplies</option></select></div>
+                           <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Unit Type</label><input type="text" value={stockForm.unit} onChange={e => setStockForm({...stockForm, unit: e.target.value})} className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="pcs / ml" /></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">{editingId ? "Adjust Qty" : "Initial Qty"}</label><input type="number" value={stockForm.stock_quantity} onChange={e => setStockForm({...stockForm, stock_quantity: e.target.value})} className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
+                           <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Safety Level</label><input type="number" value={stockForm.min_threshold} onChange={e => setStockForm({...stockForm, min_threshold: parseFloat(e.target.value) || 0})} className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Unit Cost (IDR)</label>
+                           <input type="number" value={stockForm.price_per_unit} onChange={e => setStockForm({...stockForm, price_per_unit: e.target.value})} className="w-full px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" />
+                        </div>
+                       <button onClick={handleSaveStock} className="w-full bg-slate-900 text-white py-5 rounded-[24px] font-black uppercase tracking-[0.25em] text-[10px] flex items-center justify-center gap-3 shadow-2xl shadow-slate-200 hover:scale-[1.02] active:scale-95 transition-all"><Save size={18} /> Finalize Inventory Update</button>
+                    </div>
                 </motion.div>
              </div>
            )}

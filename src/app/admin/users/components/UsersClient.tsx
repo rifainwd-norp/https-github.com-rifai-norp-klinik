@@ -34,6 +34,7 @@ export default function UsersClient() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   const supabase = createClient();
   const router = useRouter();
@@ -92,11 +93,14 @@ export default function UsersClient() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row font-sans text-slate-900">
       {/* SHARED PREMIUM SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 z-50 hidden lg:flex flex-col">
+      <aside className={`fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex flex-col z-50 transition-all duration-500 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}`}>
         <div className="p-10 flex flex-col grow">
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg"><Sparkles size={20} /></div>
-            <span className="text-2xl font-serif font-black tracking-tighter">SERENE</span>
+          <div className="flex justify-between items-center mb-12">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg"><Sparkles size={20} /></div>
+              <span className="text-2xl font-serif font-black tracking-tighter">SERENE</span>
+            </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-400 hover:text-slate-900"><X size={24} /></button>
           </div>
 
           <nav className="space-y-1.5 mb-10">
@@ -119,9 +123,9 @@ export default function UsersClient() {
           <div className="mt-auto">
              <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
                 <div className="flex items-center gap-4">
-                   <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold group-hover:bg-slate-800 transition-all">{userProfile?.full_name?.[0]}</div>
+                   <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-900 group-hover:bg-slate-800 group-hover:text-white group-hover:border-transparent transition-all">{userProfile?.full_name?.[0]}</div>
                    <div>
-                      <p className="text-xs font-black group-hover:text-white transition-colors uppercase tracking-widest">{userProfile?.full_name}</p>
+                      <p className="text-xs font-black text-slate-900 group-hover:text-white transition-colors uppercase tracking-widest">{userProfile?.full_name}</p>
                       <p className="text-[10px] font-bold text-slate-400 group-hover:text-slate-500 transition-colors uppercase tracking-widest">{userProfile?.role}</p>
                    </div>
                 </div>
@@ -141,10 +145,12 @@ export default function UsersClient() {
             </div>
             
             <div className="flex items-center gap-4">
-               <div className="bg-white px-8 py-4 rounded-3xl border border-slate-100 shadow-sm">
+               <div className="hidden sm:block bg-white px-8 py-4 rounded-3xl border border-slate-100 shadow-sm">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Registry: </span>
                   <span className="text-sm font-black text-slate-900">{profiles.length}</span>
                </div>
+               <button onClick={async () => { await supabase.auth.signOut(); router.push("/login"); }} className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-red-500 hover:bg-red-50 transition-all"><LogOut size={20}/></button>
+               <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-900"><Layers size={20}/></button>
             </div>
         </header>
 
@@ -156,13 +162,13 @@ export default function UsersClient() {
         {/* PROFILE LIST - EXECUTIVE POLISH */}
         <div className="space-y-6">
           {filtered.map((profile) => (
-            <motion.div layout key={profile.id} className="bg-white rounded-5xl p-10 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all group flex flex-col lg:flex-row items-center gap-10">
-              <div className="flex items-center gap-8 grow w-full">
-                <div className="w-20 h-20 rounded-4xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-serif text-2xl relative shadow-inner group-hover:bg-slate-900 group-hover:text-white transition-all duration-500">
+            <motion.div layout key={profile.id} className="bg-white rounded-5xl p-8 lg:p-10 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all group flex flex-col md:flex-row items-center md:items-start lg:items-center gap-8 lg:gap-10">
+              <div className="flex items-center gap-6 lg:gap-8 grow w-full">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-3xl lg:rounded-4xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-serif text-xl lg:text-2xl relative shadow-inner group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shrink-0">
                   {profile.full_name?.[0]}
                   {profile.role === 'admin' && (
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-900 text-white rounded-full border-4 border-white flex items-center justify-center shadow-lg group-hover:bg-white group-hover:text-slate-900 transition-colors">
-                       <ShieldCheck size={14}/>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 lg:w-8 lg:h-8 bg-slate-900 text-white rounded-full border-2 lg:border-4 border-white flex items-center justify-center shadow-lg group-hover:bg-white group-hover:text-slate-900 transition-colors">
+                       <ShieldCheck size={12}/>
                     </div>
                   )}
                 </div>
@@ -182,16 +188,16 @@ export default function UsersClient() {
                       </div>
                    </div>
 
-                   <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-50">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-slate-50">
                       <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500"><HeartPulse size={14}/></div>
+                         <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0"><HeartPulse size={14}/></div>
                          <div>
                             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Skin Profile</p>
                             <p className="text-xs font-black text-slate-700">{profile.skin_type || "Awaiting Scan"}</p>
                          </div>
                       </div>
                       <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-red-500"><AlertCircle size={14}/></div>
+                         <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-red-500 shrink-0"><AlertCircle size={14}/></div>
                          <div>
                             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Allergies</p>
                             <p className="text-xs font-black text-red-600 truncate max-w-[150px]">{profile.allergies || "Clear / None"}</p>

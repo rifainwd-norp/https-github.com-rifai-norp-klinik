@@ -241,6 +241,7 @@ export default function AdminDashboardClient() {
                   <span className="text-[10px] font-black text-violet-700 uppercase tracking-widest">In Treatment: </span>
                   <span className="text-sm font-black text-violet-900">{appointments.filter(a => a.status === 'treatment' || a.status === 'consultation').length}</span>
                </div>
+               <button onClick={async () => { await supabase.auth.signOut(); router.push("/login"); }} className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-red-500 hover:bg-red-50 transition-all"><LogOut size={20}/></button>
                <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-900"><Layers size={20}/></button>
             </div>
         </header>

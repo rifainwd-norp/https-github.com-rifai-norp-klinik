@@ -274,37 +274,39 @@ export async function getInventoryReport() {
 
 export async function adminSaveInventory(data: any) {
   const supabase = createAdminClient();
-  const { id, stock_quantity, ...payload } = data;
+  const { id, name, stock_quantity, ...payload } = data;
   
-  console.log("Admin Save Inventory - ID:", id, "Adjustment:", stock_quantity, "Payload:", payload);
-
-  let result;
-  if (id) {
-    // 1. Ambil stok saat ini
-    const { data: current } = await supabase.from("inventory").select("stock_quantity").eq("id", id).single();
-    const newQty = (Number(current?.stock_quantity) || 0) + (Number(stock_quantity) || 0);
-
-    // 2. Update dengan stok baru yang sudah ditambah
-    result = await supabase
+  let targetId = id;
+  
+  if (!targetId && name) {
+    const { data: existing } = await supabase
       .from("inventory")
-      .update({ ...payload, stock_quantity: newQty })
-      .eq("id", id)
+      .select("id")
+      .eq("name", name)
+      .maybeSingle();
+    if (existing) targetId = existing.id;
+  }
+
+  let res;
+  if (targetId) {
+    const { data: current } = await supabase.from("inventory").select("stock_quantity").eq("id", targetId).single();
+    const newQty = (Number(current?.stock_quantity) || 0) + (Number(stock_quantity) || 0);
+    res = await supabase
+      .from("inventory")
+      .update({ ...payload, name, stock_quantity: newQty })
+      .eq("id", targetId)
       .select();
   } else {
-    // Insert new
-    result = await supabase
+    res = await supabase
       .from("inventory")
-      .insert([{ ...payload, stock_quantity: stock_quantity || 0 }])
+      .insert([{ ...payload, name, stock_quantity: stock_quantity || 0 }])
       .select();
   }
 
-  if (result.error) {
-    console.error("Database Error:", result.error);
-    throw new Error(result.error.message);
-  }
+  if (res.error) throw new Error(res.error.message);
   revalidatePath("/admin/inventory");
   revalidatePath("/admin/inventory/report");
-  return result.data;
+  return res.data;
 }
 
 export async function adminDeleteInventory(id: string) {
