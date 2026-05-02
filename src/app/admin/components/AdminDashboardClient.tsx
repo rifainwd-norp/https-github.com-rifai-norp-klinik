@@ -12,10 +12,10 @@ import {
   adminDeductInventory,
 } from "@/app/actions/admin";
 import { 
-  Users, Calendar, Clock, LogOut, Sparkles, Loader2, Stethoscope, X, Droplets, 
-  AlertCircle, FileText, Save, CreditCard, Receipt, Scissors, UserX, Package, 
-  Layers, ShieldAlert, BarChart3, Settings, Tag, ChevronRight, LayoutDashboard,
-  ExternalLink, TrendingUp, Wallet, ArrowUpRight, Search
+  Users, Clock, LogOut, Sparkles, Loader2, Stethoscope, X, Droplets, 
+  AlertCircle, FileText, Save, CreditCard, Receipt, Scissors, Package, 
+  Layers, ShieldAlert, Tag, ChevronRight, LayoutDashboard,
+  TrendingUp, ArrowUpRight, Search
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -492,7 +492,14 @@ function ActionBtn({ active, onClick, icon, label }: { active: boolean, onClick:
   );
 }
 
-function DetailCard({ label, value, icon, color }: any) {
+interface DetailCardProps {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+  color: string;
+}
+
+function DetailCard({ label, value, icon, color }: DetailCardProps) {
    return (
       <div className="p-8 rounded-[36px] border border-slate-50 bg-slate-50/20 group hover:bg-white hover:shadow-xl transition-all duration-500">
          <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${color}`}>{icon}</div>

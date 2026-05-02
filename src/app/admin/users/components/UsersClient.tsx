@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
 import { 
-  Plus, Search, Edit2, Loader2, Save, X, ArrowLeft,
-  LayoutDashboard, Stethoscope, Package, Layers, FileText, TrendingUp, Users, LogOut, ChevronRight,
-  Sparkles, ShieldCheck, User, CreditCard, Award, CheckCircle2, AlertCircle, HeartPulse,
+  Search, Loader2, X,
+  LayoutDashboard, Stethoscope, Package, Layers, FileText, TrendingUp, Users, LogOut,
+  Sparkles, ShieldCheck, CreditCard, CheckCircle2, AlertCircle, HeartPulse,
   Calendar, AlertTriangle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,7 +31,7 @@ export default function UsersClient() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -40,26 +40,26 @@ export default function UsersClient() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const formatted = await getAllProfiles();
+      setProfiles(formatted as Profile[]);
+    } catch (err) { console.error("Load failed:", err); }
+    setLoading(false);
+  };
+
   useEffect(() => {
     async function init() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-        setUserProfile(data);
+        setUserProfile(data as Profile);
       }
       loadData();
     }
     init();
-  }, []);
-
-  async function loadData() {
-    setLoading(true);
-    try {
-      const formatted = await getAllProfiles();
-      setProfiles(formatted as Profile[]);
-    } catch (err) { console.error(err); }
-    setLoading(false);
-  }
+  }, [supabase]);
 
   const handleUpdateMemberStatus = async (userId: string, newStatus: string) => {
     setIsProcessing(true);
