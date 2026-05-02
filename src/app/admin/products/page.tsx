@@ -121,7 +121,7 @@ export default function ProductManagement() {
           </nav>
 
           <div className="mt-auto">
-             <div className="bg-slate-50 p-6 rounded-[32px] mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
+             <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
                 <div className="flex items-center gap-4">
                    <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold group-hover:bg-slate-800 transition-all">{userProfile?.full_name?.[0]}</div>
                    <div>
@@ -162,7 +162,7 @@ export default function ProductManagement() {
 
         <AnimatePresence mode="wait">
           {viewMode === "table" ? (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-white rounded-[48px] border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden overflow-x-auto">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-white rounded-5xl border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden overflow-x-auto">
                <table className="w-full text-left min-w-[1000px]">
                   <thead className="bg-slate-50/50 border-b border-slate-100">
                      <tr>
@@ -213,8 +213,8 @@ export default function ProductManagement() {
           ) : (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filtered.map((p, i) => (
-                <motion.div layout key={p.inventory_id || i} className="bg-white rounded-[48px] p-12 border border-slate-100 hover:border-slate-900/10 transition-all shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 relative overflow-hidden group">
-                   <div className="w-16 h-16 rounded-[24px] bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shadow-inner mb-10">
+                <motion.div layout key={p.inventory_id || i} className="bg-white rounded-5xl p-12 border border-slate-100 hover:border-slate-900/10 transition-all shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 relative overflow-hidden group">
+                   <div className="w-16 h-16 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shadow-inner mb-10">
                       <Package size={32}/>
                    </div>
                    <h3 className="font-serif text-3xl text-slate-900 mb-2 group-hover:translate-x-1 transition-transform">{p.name}</h3>

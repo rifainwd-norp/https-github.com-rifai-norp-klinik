@@ -81,7 +81,7 @@ export default function TreatmentManagement() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row font-sans text-slate-900">
       {/* SHARED PREMIUM SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex flex-col z-50 hidden lg:flex">
+      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex-col z-50 hidden lg:flex">
         <div className="p-10 flex flex-col grow">
           <div className="flex items-center gap-3 mb-12">
             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg"><Sparkles size={20} /></div>
@@ -106,7 +106,7 @@ export default function TreatmentManagement() {
           </nav>
 
           <div className="mt-auto">
-             <div className="bg-slate-50 p-6 rounded-[32px] mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
+             <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
                 <div className="flex items-center gap-4">
                    <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold group-hover:bg-slate-800 transition-all">{userProfile?.full_name?.[0]}</div>
                    <div>
@@ -149,9 +149,9 @@ export default function TreatmentManagement() {
           {viewMode === "grid" ? (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filtered.map((t, i) => (
-                <motion.div layout key={t.id || i} className="bg-white rounded-[48px] p-12 border border-slate-100 hover:border-slate-900/10 transition-all shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 relative overflow-hidden group">
+                <motion.div layout key={t.id || i} className="bg-white rounded-5xl p-12 border border-slate-100 hover:border-slate-900/10 transition-all shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 relative overflow-hidden group">
                    <div className="flex justify-between items-start mb-10">
-                      <div className="w-16 h-16 rounded-[24px] bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shadow-inner">
+                      <div className="w-16 h-16 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shadow-inner">
                          {t.category === 'Laser' ? <Sparkles size={32}/> : t.category === 'Peeling' ? <Droplets size={32}/> : <Stethoscope size={32}/>}
                       </div>
                       <button onClick={() => { setEditingId(t.id); setFormData({ ...t, price: t.price.toString() }); setIsAdding(true); }} className="p-4 text-slate-300 hover:text-slate-900 hover:bg-slate-50 rounded-2xl transition-all"><Edit2 size={18}/></button>
@@ -170,7 +170,7 @@ export default function TreatmentManagement() {
               ))}
             </motion.div>
           ) : (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-white rounded-[48px] border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden overflow-x-auto">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-white rounded-5xl border border-slate-100 shadow-xl shadow-slate-100 overflow-hidden overflow-x-auto">
                <table className="w-full text-left min-w-[900px]">
                   <thead className="bg-slate-50/50 border-b border-slate-100">
                      <tr>
@@ -221,17 +221,17 @@ export default function TreatmentManagement() {
                   </div>
                   <div className="space-y-8">
                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Treatment Name</label><input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
-                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Clinical Category</label><select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black appearance-none"><option>Facial</option><option>Peeling</option><option>Injection</option><option>Laser</option></select></div>
+                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Treatment Name</label><input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
+                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Clinical Category</label><select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black appearance-none"><option>Facial</option><option>Peeling</option><option>Injection</option><option>Laser</option></select></div>
                      </div>
                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Price (IDR)</label><input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
-                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Duration (Mins)</label><input type="number" value={formData.duration_minutes} onChange={e => setFormData({...formData, duration_minutes: parseInt(e.target.value)})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
+                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Price (IDR)</label><input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
+                        <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Duration (Mins)</label><input type="number" value={formData.duration_minutes} onChange={e => setFormData({...formData, duration_minutes: parseInt(e.target.value)})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" /></div>
                      </div>
-                     <div className="p-8 bg-red-50 rounded-[32px] border border-red-100 shadow-inner">
+                     <div className="p-8 bg-red-50 rounded-4xl border border-red-100 shadow-inner">
                         <label className="text-[10px] font-black uppercase tracking-widest text-red-600 mb-4 block">Promotional Benefit (%)</label>
                         <div className="flex items-center gap-4">
-                           <input type="number" value={formData.promo_discount_percent} onChange={e => setFormData({...formData, promo_discount_percent: parseInt(e.target.value) || 0})} className="w-full px-8 py-5 rounded-[24px] border border-red-200 bg-white font-black text-red-600 outline-none focus:border-red-500 shadow-sm" />
+                           <input type="number" value={formData.promo_discount_percent} onChange={e => setFormData({...formData, promo_discount_percent: parseInt(e.target.value) || 0})} className="w-full px-8 py-5 rounded-3xl border border-red-200 bg-white font-black text-red-600 outline-none focus:border-red-500 shadow-sm" />
                            <span className="text-3xl font-serif text-red-300">%</span>
                         </div>
                      </div>

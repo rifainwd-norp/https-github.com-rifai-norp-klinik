@@ -229,7 +229,7 @@ function ServiceStep({ services, data, setData, onNext }: any) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
         {filtered.map((s:any) => (
           <div key={s.id} onClick={() => { setData({ ...data, service_id: s.id, service: s.name, price: s.price, duration_minutes: s.duration_minutes || 60 }); onNext(); }} className="group relative bg-white rounded-3xl md:rounded-4xl border border-slate-50 overflow-hidden cursor-pointer hover:shadow-2xl transition-all duration-500">
-            <div className="aspect-[16/9] md:aspect-4/5 relative overflow-hidden">
+            <div className="aspect-video md:aspect-4/5 relative overflow-hidden">
               <Image src={s.image_url || "/images/facials.png"} alt={s.name} fill sizes="400px" className="object-cover group-hover:scale-110 transition-transform duration-1000" />
               <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl font-serif text-[10px] md:text-sm shadow-lg">Rp {parseInt(s.price).toLocaleString('id-ID')}</div>
             </div>

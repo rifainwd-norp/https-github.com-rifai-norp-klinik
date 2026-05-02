@@ -169,19 +169,19 @@ export default function HomePage() {
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white/10 flex items-center justify-center font-black text-xs md:text-sm border border-white/10 uppercase">{userName?.[0] || 'U'}</div>
                     <div className="text-left">
                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/50 leading-none mb-1">Accessing Portal</p>
-                       <p className="text-[10px] font-black uppercase tracking-[0.1em] leading-none">My Account</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest leading-none">My Account</p>
                     </div>
                     <ChevronDown size={14} className={`transition-transform duration-500 ${isPortalDropdownOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   <AnimatePresence>
                     {isPortalDropdownOpen && (
-                      <motion.div initial={{ opacity: 0, y: 15, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 15, scale: 0.95 }} className="absolute right-0 mt-4 w-80 bg-white/95 backdrop-blur-3xl border border-slate-50 shadow-[0_40px_80px_-16px_rgba(0,0,0,0.15)] rounded-[32px] overflow-hidden p-4 z-50">
+                      <motion.div initial={{ opacity: 0, y: 15, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 15, scale: 0.95 }} className="absolute right-0 mt-4 w-80 bg-white/95 backdrop-blur-3xl border border-slate-50 shadow-[0_40px_80px_-16px_rgba(0,0,0,0.15)] rounded-4xl overflow-hidden p-4 z-50">
                          <div className="p-5 bg-slate-900 rounded-3xl mb-4 flex items-center gap-4 shadow-xl">
-                            <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center font-black text-xl border border-white/10">{userName?.[0] || 'U'}</div>
+                            <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center font-black text-sm border border-white/10 uppercase">{userName?.[0] || 'U'}</div>
                             <div>
-                               <p className="text-sm font-black text-white truncate max-w-[140px]">{userName}</p>
-                               <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mt-0.5">Verified Profile</p>
+                               <p className="text-sm font-black text-white truncate max-w-[140px] leading-none mb-1">{userName}</p>
+                               <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest leading-none">Verified Profile</p>
                             </div>
                          </div>
                          <div className="space-y-1">
@@ -291,7 +291,7 @@ export default function HomePage() {
            </div>
 
            <div className="lg:col-span-5 relative mt-12 lg:mt-0">
-              <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5, ease: "circOut" }} className="relative aspect-4/5 rounded-[48px] md:rounded-5xl overflow-hidden shadow-2xl">
+              <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5, ease: "circOut" }} className="relative aspect-4/5 rounded-5xl md:rounded-5xl overflow-hidden shadow-2xl">
                  <Image src="/images/hero.png" alt="Clinical Treatment" fill className="object-cover" priority />
                  <div className="absolute inset-0 bg-linear-to-t from-slate-900/40 to-transparent" />
               </motion.div>
@@ -323,7 +323,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
             {services.map((service, idx) => (
               <motion.div key={service.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} viewport={{ once: true }} className="group relative flex flex-col h-full bg-white rounded-4xl border border-slate-50 shadow-sm hover:shadow-2xl transition-all duration-700">
-                <div className="aspect-4/5 relative overflow-hidden rounded-[32px] m-3 md:m-4">
+                <div className="aspect-4/5 relative overflow-hidden rounded-4xl m-3 md:m-4">
                   <Image src={service.image_url || "/images/facials.png"} alt={service.name} fill sizes="400px" className="object-cover group-hover:scale-110 transition-transform duration-[2s]" />
                   <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl font-serif text-xs shadow-xl">Rp {parseInt(service.price).toLocaleString('id-ID')}</div>
                 </div>
@@ -360,7 +360,7 @@ export default function HomePage() {
                  <FooterList title="Menu" items={["Treatments", "Experts", "Analysis", "Points"]} />
                  <FooterList title="Legal" items={["Privacy", "Terms", "Audits"]} />
                  <div className="space-y-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">Visit Us</h4>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-8">Clinical Aesthetic Protocol</p>
                     <p className="text-sm text-slate-400 font-bold leading-relaxed uppercase tracking-[0.15em]">Jl. Serene Beauty No. 88<br/>Jakarta Selatan</p>
                  </div>
               </div>
@@ -383,7 +383,7 @@ export default function HomePage() {
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 50 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 50 }} className="relative w-full max-w-xl bg-white rounded-5xl md:rounded-[56px] p-8 md:p-16 shadow-2xl overflow-hidden border border-white/20">
               <button onClick={() => setIsLoginModalOpen(false)} className="absolute top-6 md:top-10 right-6 md:right-10 text-slate-300 hover:text-slate-900 transition-colors"><X size={28} /></button>
               <div className="text-center mb-10 md:mb-12">
-                <div className="w-14 h-14 md:w-16 md:h-16 bg-slate-900 text-white rounded-[24px] flex items-center justify-center mx-auto mb-6 md:mb-8"><UserIcon size={32} /></div>
+                <div className="w-14 h-14 md:w-16 md:h-16 bg-slate-900 text-white rounded-3xl flex items-center justify-center mx-auto mb-6 md:mb-8"><UserIcon size={32} /></div>
                 <h2 className="font-serif text-4xl md:text-5xl mb-3 text-slate-900 tracking-tight">{isLogin ? "Welcome" : "Join Us"}</h2>
                 <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.25em]">{isLogin ? "Access Your Clinical Portal" : "Begin Your Skin Journey"}</p>
               </div>

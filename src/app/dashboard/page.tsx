@@ -159,7 +159,7 @@ export default function PatientDashboard() {
             </div>
             <div className="flex gap-4">
                <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-900"><Activity size={20}/></button>
-               <Link href="/booking" className="bg-slate-900 text-white px-10 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">
+               <Link href="/booking" className="bg-slate-900 text-white px-10 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">
                   <Plus size={18} /> Schedule Treatment
                </Link>
             </div>
@@ -268,13 +268,13 @@ export default function PatientDashboard() {
 
                     <div className="flex justify-center gap-3 mb-10">
                        {[1, 2, 3, 4, 5].map(s => (
-                          <button key={s} onClick={() => setRating(s)} className={`w-14 h-14 lg:w-16 lg:h-16 rounded-[24px] transition-all flex items-center justify-center ${rating >= s ? "bg-amber-100 text-amber-500" : "bg-slate-50 text-slate-300"}`}><Star size={24} fill={rating >= s ? "currentColor" : "none"} /></button>
+                          <button key={s} onClick={() => setRating(s)} className={`w-14 h-14 lg:w-16 lg:h-16 rounded-3xl transition-all flex items-center justify-center ${rating >= s ? "bg-amber-100 text-amber-500" : "bg-slate-50 text-slate-300"}`}><Star size={24} fill={rating >= s ? "currentColor" : "none"} /></button>
                        ))}
                     </div>
 
                     <div className="space-y-4 mb-10">
                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-4">Clinical Feedback (Optional)</p>
-                       <textarea value={feedback} onChange={(e) => setFeedback(e.target.value)} className="w-full h-32 p-8 rounded-[32px] border border-slate-100 bg-slate-50/50 outline-none focus:border-slate-900 focus:bg-white transition-all text-sm font-medium leading-relaxed" placeholder="Share your experience with the treatment..." />
+                       <textarea value={feedback} onChange={(e) => setFeedback(e.target.value)} className="w-full h-32 p-8 rounded-4xl border border-slate-100 bg-slate-50/50 outline-none focus:border-slate-900 focus:bg-white transition-all text-sm font-medium leading-relaxed" placeholder="Share your experience with the treatment..." />
                     </div>
 
                     <button onClick={submitRating} disabled={isSubmitting} className="w-full bg-slate-900 text-white py-6 rounded-[28px] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">

@@ -141,7 +141,7 @@ export default function UserManagement() {
             </div>
             
             <div className="flex items-center gap-4">
-               <div className="bg-white px-8 py-4 rounded-[20px] border border-slate-100 shadow-sm">
+               <div className="bg-white px-8 py-4 rounded-3xl border border-slate-100 shadow-sm">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Registry: </span>
                   <span className="text-sm font-black text-slate-900">{profiles.length}</span>
                </div>
@@ -218,7 +218,7 @@ export default function UserManagement() {
               </div>
 
               {/* TIER CONTROL */}
-              <div className="flex flex-col gap-2 w-full lg:w-56 bg-slate-50 p-4 rounded-[32px] border border-slate-100">
+              <div className="flex flex-col gap-2 w-full lg:w-56 bg-slate-50 p-4 rounded-4xl border border-slate-100">
                  <div className="grid grid-cols-2 gap-2">
                     {["basic", "silver", "gold", "platinum"].map(tier => (
                         <button 

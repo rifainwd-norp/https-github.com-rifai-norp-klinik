@@ -204,7 +204,7 @@ export default function AdminDashboard() {
           </nav>
 
           <div className="mt-auto">
-             <div className="bg-slate-50 p-6 rounded-[32px] mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
+             <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
                 <div className="flex items-center gap-4">
                    <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-900 group-hover:bg-slate-800 group-hover:text-white group-hover:border-transparent transition-all">{userProfile?.full_name?.[0]}</div>
                    <div>
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
           });
           
           return (
-            <div className="bg-white rounded-[32px] lg:rounded-[48px] border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] overflow-hidden">
+            <div className="bg-white rounded-4xl lg:rounded-5xl border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] overflow-hidden">
               {/* MOBILE CARD VIEW */}
               <div className="block lg:hidden divide-y divide-slate-50">
                  {filtered.map((appt) => (
@@ -380,7 +380,7 @@ export default function AdminDashboard() {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-bl-[200px] -mr-32 -mt-32 opacity-50" />
                     
                     <div className="relative text-center mb-12">
-                       <div className="w-20 h-20 bg-emerald-600 rounded-[32px] flex items-center justify-center text-white mx-auto mb-6 shadow-2xl shadow-emerald-200"><Receipt size={40}/></div>
+                       <div className="w-20 h-20 bg-emerald-600 rounded-4xl flex items-center justify-center text-white mx-auto mb-6 shadow-2xl shadow-emerald-200"><Receipt size={40}/></div>
                        <h2 className="font-serif text-4xl mb-2 text-slate-900">Final Settlement</h2>
                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.25em]">Review and Complete Transaction</p>
                     </div>
@@ -416,7 +416,7 @@ export default function AdminDashboard() {
 
                     <div className="grid grid-cols-2 gap-4">
                        {['Cash', 'Transfer', 'Card', 'E-Wallet'].map(method => (
-                         <button key={method} onClick={() => handleCheckout(method)} disabled={isProcessing} className="py-5 rounded-[24px] border border-slate-100 hover:border-slate-900 hover:bg-slate-900 hover:text-white transition-all text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 group">
+                         <button key={method} onClick={() => handleCheckout(method)} disabled={isProcessing} className="py-5 rounded-3xl border border-slate-100 hover:border-slate-900 hover:bg-slate-900 hover:text-white transition-all text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 group">
                             <CreditCard size={18} className="text-slate-400 group-hover:text-white transition-colors"/> {method}
                          </button>
                        ))}

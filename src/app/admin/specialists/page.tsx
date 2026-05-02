@@ -104,7 +104,7 @@ export default function SpecialistManagement() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row font-sans text-slate-900">
       {/* SHARED PREMIUM SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex flex-col z-50 hidden lg:flex">
+      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex-col z-50 hidden lg:flex">
         <div className="p-10 flex flex-col grow">
           <div className="flex items-center gap-3 mb-12">
             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg"><Sparkles size={20} /></div>
@@ -129,7 +129,7 @@ export default function SpecialistManagement() {
           </nav>
 
           <div className="mt-auto">
-             <div className="bg-slate-50 p-6 rounded-[32px] mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
+             <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
                 <div className="flex items-center gap-4">
                    <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold group-hover:bg-slate-800 transition-all">{userProfile?.full_name?.[0]}</div>
                    <div>
@@ -161,7 +161,7 @@ export default function SpecialistManagement() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {specialists.map((spec) => (
             <motion.div key={spec.id} layout className="bg-white rounded-[56px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden flex flex-col">
-              <div className="aspect-[4/5] relative overflow-hidden">
+              <div className="aspect-4/5 relative overflow-hidden">
                 <Image src={spec.image_url || "/images/hero.png"} alt={spec.name} fill sizes="400px" className="object-cover group-hover:scale-110 transition-transform duration-1000 grayscale group-hover:grayscale-0" />
                 
                 <div className="absolute top-8 right-8 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
@@ -169,7 +169,7 @@ export default function SpecialistManagement() {
                   <button onClick={() => setDeleteTarget(spec.id)} className="p-4 bg-white/90 backdrop-blur-xl rounded-2xl text-red-500 shadow-2xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18}/></button>
                 </div>
 
-                <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/10 backdrop-blur-md rounded-[32px] border border-white/20 shadow-2xl">
+                <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/10 backdrop-blur-md rounded-4xl border border-white/20 shadow-2xl">
                    <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                          <Star size={16} className="text-amber-400" fill="currentColor" />
@@ -204,22 +204,22 @@ export default function SpecialistManagement() {
                       <button onClick={resetForm} className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-red-500 transition-all"><X size={24}/></button>
                    </div>
                    <div className="space-y-8">
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Full Name & Title</label>
-                         <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="Dr. Sarah Johnson, Sp.KK" />
-                      </div>
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Clinical Specialty</label>
-                         <input type="text" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="Lead Dermatologist" />
-                      </div>
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Professional Biography</label>
-                         <textarea value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-medium h-32 resize-none" placeholder="Clinical expertise, background and certifications..." />
-                      </div>
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Profile Image Asset URL</label>
-                         <input type="text" value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} className="w-full px-8 py-5 rounded-[24px] border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="https://cloud.storage/specialist-01.png" />
-                      </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Full Name & Title</label>
+                          <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="Dr. Sarah Johnson, Sp.KK" />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Clinical Specialty</label>
+                          <input type="text" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="Lead Dermatologist" />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Professional Biography</label>
+                          <textarea value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-medium h-32 resize-none" placeholder="Clinical expertise, background and certifications..." />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Profile Image Asset URL</label>
+                          <input type="text" value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} className="w-full px-8 py-5 rounded-3xl border border-slate-100 bg-slate-50/50 outline-none focus:bg-white focus:border-slate-900 transition-all text-sm font-black" placeholder="https://cloud.storage/specialist-01.png" />
+                       </div>
                       <button onClick={handleSave} disabled={isProcessing} className="w-full bg-slate-900 text-white py-6 rounded-[28px] font-black uppercase tracking-[0.25em] text-[10px] flex items-center justify-center gap-3 shadow-2xl shadow-slate-200 hover:scale-[1.02] active:scale-95 transition-all">
                          {isProcessing ? <Loader2 className="animate-spin" size={18}/> : <><Save size={18} /> Update Professional Registry</>}
                       </button>
@@ -229,7 +229,7 @@ export default function SpecialistManagement() {
            )}
 
            {statusMsg && (
-             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className={`fixed bottom-12 right-12 z-100 px-10 py-6 rounded-[32px] shadow-2xl flex items-center gap-5 border ${statusMsg.type === 'success' ? 'bg-slate-900 text-white border-slate-800' : 'bg-red-600 text-white border-red-500'}`}>
+             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className={`fixed bottom-12 right-12 z-100 px-10 py-6 rounded-4xl shadow-2xl flex items-center gap-5 border ${statusMsg.type === 'success' ? 'bg-slate-900 text-white border-slate-800' : 'bg-red-600 text-white border-red-500'}`}>
                 {statusMsg.type === 'success' ? <CheckCircle2 className="text-emerald-400" size={24}/> : <AlertTriangle size={24}/>}
                 <span className="text-[10px] font-black uppercase tracking-[0.25em]">{statusMsg.text}</span>
              </motion.div>
@@ -242,7 +242,7 @@ export default function SpecialistManagement() {
             <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteTarget(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-sm bg-white rounded-[56px] p-16 shadow-2xl text-center">
-                <div className="w-20 h-20 bg-red-50 rounded-[32px] flex items-center justify-center text-red-500 mx-auto mb-8 shadow-inner"><AlertTriangle size={40} /></div>
+                <div className="w-20 h-20 bg-red-50 rounded-4xl flex items-center justify-center text-red-500 mx-auto mb-8 shadow-inner"><AlertTriangle size={40} /></div>
                 <h3 className="font-serif text-3xl text-slate-900 mb-4 tracking-tighter">Archive Expert?</h3>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed mb-10">This will remove the specialist from the clinical registry. Historical session data will be preserved but the profile will no longer be active.</p>
                 <div className="flex flex-col gap-3">

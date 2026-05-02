@@ -71,7 +71,7 @@ export default function StatisticsPage() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row font-sans text-slate-900">
       {/* SHARED PREMIUM SIDEBAR */}
-      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex flex-col z-50 hidden lg:flex print:hidden">
+      <aside className="fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex-col z-50 hidden lg:flex print:hidden">
         <div className="p-10 flex flex-col grow">
           <div className="flex items-center gap-3 mb-12">
             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg"><Sparkles size={20} /></div>
@@ -96,7 +96,7 @@ export default function StatisticsPage() {
           </nav>
 
           <div className="mt-auto">
-             <div className="bg-slate-50 p-6 rounded-[32px] mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
+             <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
                 <div className="flex items-center gap-4">
                    <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold group-hover:bg-slate-800 transition-all">{userProfile?.full_name?.[0]}</div>
                    <div>
@@ -133,7 +133,7 @@ export default function StatisticsPage() {
                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.25em]">Comprehensive Performance Monitoring</p>
             </div>
             
-            <button onClick={() => window.print()} className="bg-slate-900 text-white px-10 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">
+            <button onClick={() => window.print()} className="bg-slate-900 text-white px-10 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">
                <Printer size={18} /> Export Analytics
             </button>
         </header>
@@ -148,7 +148,7 @@ export default function StatisticsPage() {
 
         {/* DETAILED INSIGHTS - EXECUTIVE STYLE */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-           <div className="bg-white rounded-[48px] p-12 border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+           <div className="bg-white rounded-5xl p-12 border border-slate-100 shadow-sm hover:shadow-xl transition-all">
               <div className="flex items-center justify-between mb-10">
                  <h3 className="font-serif text-2xl text-slate-900">Patient Velocity</h3>
                  <Clock className="text-slate-200" size={24}/>
@@ -170,7 +170,7 @@ export default function StatisticsPage() {
               </div>
            </div>
 
-           <div className="bg-white rounded-[48px] p-12 border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+           <div className="bg-white rounded-5xl p-12 border border-slate-100 shadow-sm hover:shadow-xl transition-all">
               <div className="flex items-center justify-between mb-10">
                  <h3 className="font-serif text-2xl text-slate-900">Quality Indices</h3>
                  <ShieldCheck className="text-slate-200" size={24}/>
@@ -195,7 +195,7 @@ export default function StatisticsPage() {
            </div>
         </div>
 
-        <div className="mt-16 p-12 bg-slate-900 rounded-[48px] text-white flex flex-col md:flex-row justify-between items-center gap-10 overflow-hidden relative group">
+        <div className="mt-16 p-12 bg-slate-900 rounded-5xl text-white flex flex-col md:flex-row justify-between items-center gap-10 overflow-hidden relative group">
            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:scale-150 transition-transform duration-1000" />
            <div className="relative z-10">
               <h2 className="font-serif text-3xl mb-4">Strategic Insight</h2>
@@ -220,7 +220,7 @@ function NavItem({ icon, label, active = false }: { icon: React.ReactNode, label
 
 function StatCard({ label, value, icon, color }: any) {
    return (
-      <div className="bg-white p-10 rounded-[48px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden print:border-none print:p-0">
+      <div className="bg-white p-10 rounded-5xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden print:border-none print:p-0">
          <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-[100px] -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-all duration-700 print:hidden" />
          <div className="relative">
             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 ${color} shadow-sm print:hidden`}>{icon}</div>
