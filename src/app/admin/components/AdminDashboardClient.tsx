@@ -15,7 +15,7 @@ import {
   Users, Clock, LogOut, Sparkles, Loader2, Stethoscope, X, Droplets, 
   AlertCircle, FileText, Save, CreditCard, Receipt, Scissors, Package, 
   Layers, ShieldAlert, Tag, ChevronRight, LayoutDashboard,
-  TrendingUp, ArrowUpRight, Search
+  TrendingUp, ArrowUpRight, Search, UserX
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
