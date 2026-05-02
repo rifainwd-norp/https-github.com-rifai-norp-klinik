@@ -162,7 +162,7 @@ export default function UsersClient() {
         {/* PROFILE LIST - EXECUTIVE POLISH */}
         <div className="space-y-6">
           {filtered.map((profile) => (
-            <motion.div layout key={profile.id} className="bg-white rounded-5xl p-8 lg:p-10 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all group flex flex-col md:flex-row items-center md:items-start lg:items-center gap-8 lg:gap-10">
+            <motion.div key={profile.id} className="bg-white rounded-5xl p-8 lg:p-10 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all group flex flex-col md:flex-row items-center md:items-start lg:items-center gap-8 lg:gap-10">
               <div className="flex items-center gap-6 lg:gap-8 grow w-full">
                 <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-3xl lg:rounded-4xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-serif text-xl lg:text-2xl relative shadow-inner group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shrink-0">
                   {profile.full_name?.[0]}
