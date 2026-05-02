@@ -9,16 +9,20 @@ import {
   ArrowRight, 
   Sparkles,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function LoginPage() {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const supabase = createClient();
   const router = useRouter();
@@ -30,11 +34,13 @@ export default function LoginPage() {
 
     try {
       if (isRegistering) {
+        if (!fullName.trim()) throw new Error("Please enter your full name.");
+        
         const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { full_name: email.split("@")[0] }
+            data: { full_name: fullName }
           }
         });
         if (signUpErr) throw signUpErr;
@@ -44,7 +50,7 @@ export default function LoginPage() {
            router.push("/complete-profile");
         } else {
            // Email confirmation required
-           setErrorMsg("✅ Akun berhasil dibuat! Silakan cek inbox email Anda untuk melakukan konfirmasi sebelum login.");
+           setErrorMsg("Account created successfully. Please check your inbox for confirmation.");
            setIsRegistering(false); // Balik ke login mode
         }
       } else {
@@ -55,9 +61,9 @@ export default function LoginPage() {
 
         if (signInErr) {
           if (signInErr.message.toLowerCase().includes("email not confirmed")) {
-            setErrorMsg("📧 Email belum dikonfirmasi. Cek inbox Anda, atau minta admin untuk menonaktifkan konfirmasi email di Supabase Dashboard → Authentication → Providers → Email.");
+            setErrorMsg("Email not confirmed. Please check your inbox.");
           } else if (signInErr.message.toLowerCase().includes("invalid login credentials")) {
-            setErrorMsg("❌ Email atau password salah. Silakan coba lagi.");
+            setErrorMsg("Incorrect email or password.");
           } else {
             throw signInErr;
           }
@@ -89,64 +95,91 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-6 font-sans text-slate-900 selection:bg-slate-900 selection:text-white">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-[40px] shadow-premium p-10 lg:p-14"
+        className="max-w-md w-full bg-white rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] p-10 lg:p-14 border border-slate-100"
       >
         <div className="text-center mb-10">
-          <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-4">
-            <Sparkles size={28} />
+          <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-slate-200">
+            <Sparkles size={32} />
           </div>
-          <h1 className="font-serif text-3xl text-on-surface mb-2">
+          <h1 className="font-serif text-3xl md:text-4xl text-slate-900 mb-2 tracking-tight">
             {isRegistering ? "Join Serene" : "Welcome Back"}
           </h1>
-          <p className="text-on-surface-variant text-sm font-medium">
-            Clinical excellence, personalized for you.
+          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+            Clinical excellence, personalized.
           </p>
         </div>
 
         <form onSubmit={handleEmailLogin} className="space-y-6">
+          <AnimatePresence>
+            {isRegistering && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-2 overflow-hidden">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Full Name</label>
+                <div className="relative">
+                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <input 
+                    type="text" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full pl-14 pr-6 py-5 rounded-3xl border border-slate-100 outline-none focus:border-slate-900 focus:bg-white bg-slate-50/50 text-sm font-bold transition-all"
+                    placeholder="Your Full Name"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-primary ml-2">Email Address</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" size={18} />
+              <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input 
                 required
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 rounded-2xl border border-outline-variant outline-none focus:border-primary bg-surface-variant/10 text-sm font-bold"
-                placeholder="doctor@serene.com"
+                className="w-full pl-14 pr-6 py-5 rounded-3xl border border-slate-100 outline-none focus:border-slate-900 focus:bg-white bg-slate-50/50 text-sm font-bold transition-all"
+                placeholder="your.email@example.com"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-primary ml-2">Security Password</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Security Password</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" size={18} />
+              <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input 
                 required
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 rounded-2xl border border-outline-variant outline-none focus:border-primary bg-surface-variant/10 text-sm font-bold"
+                className="w-full pl-14 pr-14 py-5 rounded-3xl border border-slate-100 outline-none focus:border-slate-900 focus:bg-white bg-slate-50/50 text-sm font-bold transition-all"
                 placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
           <AnimatePresence>
             {errorMsg && (
               <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-error/10 text-error p-4 rounded-2xl flex items-start gap-3 text-xs font-bold leading-relaxed border border-error/20"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="bg-red-50 text-red-600 p-5 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest border border-red-100"
               >
-                <AlertCircle size={16} className="shrink-0" />
+                <AlertCircle size={20} className="shrink-0" />
                 {errorMsg}
               </motion.div>
             )}
@@ -155,7 +188,7 @@ export default function LoginPage() {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-white py-5 rounded-3xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all"
+            className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 shadow-2xl shadow-slate-200 hover:scale-[1.02] active:scale-95 transition-all mt-4"
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : (
               <>
@@ -165,12 +198,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-8 pt-8 border-t border-outline-variant/30 text-center">
+        <div className="mt-10 pt-8 border-t border-slate-50 text-center">
           <button 
-            onClick={() => setIsRegistering(!isRegistering)}
-            className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
+            onClick={() => { setIsRegistering(!isRegistering); setErrorMsg(null); }}
+            className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors"
           >
-            {isRegistering ? "Already have an account? Login" : "New patient? Create your profile"}
+            {isRegistering ? "Already have an account? Login" : "New patient? Create profile"}
           </button>
         </div>
       </motion.div>

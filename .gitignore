@@ -21,6 +21,8 @@ node_modules
 # misc
 .DS_Store
 *.pem
+laporan.md
+prd.md
 
 # debug
 npm-debug.log*
