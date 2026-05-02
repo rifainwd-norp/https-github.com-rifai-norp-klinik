@@ -24,9 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
-        className={`${manrope.variable} ${notoSerif.variable} antialiased noise-bg glow-mesh`}
+        className={`${manrope.variable} ${notoSerif.variable} antialiased noise-bg glow-mesh relative`}
       >
         <SmoothScroll>
           {children}

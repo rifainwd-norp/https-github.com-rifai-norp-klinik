@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model Profile {
+  id         String   @id @db.Uuid
+  updatedAt  DateTime? @map("updated_at") @db.Timestamptz(6)
+  fullName   String?  @map("full_name")
+  avatarUrl  String?  @map("avatar_url")
+  role       String?  @default("patient")
+  
+  @@map("profiles")
+}
+
+model Service {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  name        String
+  category    String
+  price       String
+  description String?
+  imageUrl    String?  @map("image_url")
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+model Specialist {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  name        String
+  role        String
+  bio         String?
+  imageUrl    String?  @map("image_url")
+  appointments Appointment[]
+
+  @@map("specialists")
+}
+
+model Appointment {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  userId          String     @map("user_id") @db.Uuid
+  serviceId       String     @map("service_id") @db.Uuid
+  specialistId    String     @map("specialist_id") @db.Uuid
+  appointmentDate DateTime   @map("appointment_date") @db.Date
+  appointmentTime String     @map("appointment_time")
+  status          String?    @default("pending")
+  notes           String?
+  
+  service         Service    @relation(fields: [serviceId], references: [id])
+  specialist      Specialist @relation(fields: [specialistId], references: [id])
+
+  @@map("appointments")
+}

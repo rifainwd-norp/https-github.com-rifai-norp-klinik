@@ -184,7 +184,7 @@ export default function PatientPortalPage() {
   );
 }
 
-function RecoveryItem({ icon, title, text }) {
+function RecoveryItem({ icon, title, text }: { icon: any, title: any, text: any }) {
   return (
     <div className="flex gap-4 items-start group">
       <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
@@ -198,7 +198,7 @@ function RecoveryItem({ icon, title, text }) {
   );
 }
 
-function TimelineItem({ date, title, text, active = false }) {
+function TimelineItem({ date, title, text, active = false }: { date: any, title: any, text: any, active?: any }) {
   return (
     <div className="relative pl-10">
       <div className={`absolute left-0 top-1 w-6 h-6 rounded-full border-4 border-background z-10 transition-colors ${active ? "bg-primary shadow-lg shadow-primary/30" : "bg-outline-variant"}`} />

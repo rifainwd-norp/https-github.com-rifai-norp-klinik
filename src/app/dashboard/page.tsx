@@ -1,243 +1,314 @@
 "use client";
 
-import Sidebar from "@/components/Sidebar";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter, usePathname } from "next/navigation";
 import { 
-  Bell, 
-  Search, 
-  ArrowRight, 
-  MoreVertical, 
-  CheckCircle, 
-  AlertCircle, 
-  RefreshCw,
-  Syringe,
-  ShieldCheck,
-  Stethoscope,
-  X
+  LogOut, 
+  Sparkles,
+  Loader2,
+  Plus,
+  Activity,
+  Star,
+  MessageSquare,
+  Save,
+  AlertCircle,
+  LayoutDashboard,
+  Calendar,
+  History,
+  Award,
+  ChevronRight,
+  HeartPulse,
+  Droplets,
+  X,
+  ArrowUpRight
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
-const INITIAL_APPOINTMENTS = [
-  { id: 1, patient: "Eleanor Rigby", service: "Microneedling RF", time: "09:00 AM", status: "Checked In", room: "Suite 02" },
-  { id: 2, patient: "Julian Casablancas", service: "BOTOX® Cosmetic", time: "10:30 AM", status: "Upcoming", room: "Suite 04" },
-  { id: 3, patient: "Sia Furler", service: "Chemical Peel", time: "01:00 PM", status: "In Progress", room: "Suite 01" },
-  { id: 4, patient: "David Bowie", service: "Laser Resurfacing", time: "02:30 PM", status: "Upcoming", room: "Suite 03" },
-];
+type Appointment = {
+  id: string;
+  appointment_date: string;
+  appointment_time: string;
+  status: string;
+  rating: number | null;
+  feedback: string | null;
+  services: { name: string, price: string, category: string } | null;
+  specialists: { name: string } | null;
+};
 
-const INITIAL_ALERTS = [
-  { id: 1, type: "inventory", title: "Low Stock: Botox 100u", desc: "3 vials remaining. Typical weekly usage is 8 vials.", priority: "High" },
-  { id: 2, type: "system", title: "EMR Audit Required", desc: "12 records pending practitioner sign-off.", priority: "Medium" },
-];
+type UserProfile = {
+  full_name: string;
+  member_status: string;
+  loyalty_points: number;
+  member_id?: string;
+  id: string;
+  skin_type: string | null;
+  allergies: string | null;
+  role: string;
+};
 
-export default function AdminDashboard() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [appointments, setAppointments] = useState(INITIAL_APPOINTMENTS);
-  const [alerts, setAlerts] = useState(INITIAL_ALERTS);
+export default function PatientDashboard() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null);
+  const [rating, setRating] = useState(5);
+  const [feedback, setFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const filteredAppointments = useMemo(() => {
-    return appointments.filter(a => 
-      a.patient.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      a.service.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, appointments]);
+  const supabase = createClient();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const dismissAlert = (id: number) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== id));
+  const fetchDashboardData = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { router.push("/login"); return; }
+
+    const { data: pData } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+    if (pData) setProfile(pData as UserProfile);
+
+    const { data: appts } = await supabase.from("appointments").select(`
+      id, appointment_date, appointment_time, status, rating, feedback,
+      services:service_id (name, price, category),
+      specialists:specialist_id (name)
+    `).eq("user_id", user.id).order('appointment_date', { ascending: false });
+
+    if (appts) setAppointments(appts as unknown as Appointment[]);
+    setLoading(false);
   };
 
-  const updateStatus = (id: number, newStatus: string) => {
-    setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const submitRating = async () => {
+    if (!selectedAppt) return;
+    setIsSubmitting(true);
+    const { error } = await supabase.from("appointments").update({ rating, feedback }).eq("id", selectedAppt.id);
+    if (!error) {
+       setSelectedAppt(null);
+       fetchDashboardData();
+    }
+    setIsSubmitting(false);
   };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+      case 'cancelled': return 'bg-red-50 text-red-700 border-red-100';
+      case 'pending': return 'bg-amber-50 text-amber-700 border-amber-100';
+      case 'treatment': return 'bg-violet-50 text-violet-700 border-violet-100';
+      default: return 'bg-slate-50 text-slate-500 border-slate-100';
+    }
+  };
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA]"><Loader2 className="animate-spin text-slate-900" size={40} /></div>;
 
   return (
-    <div className="min-h-screen bg-mesh flex">
-      <Sidebar />
-
-      <main className="flex-1 md:ml-72 p-8 md:p-16 max-w-7xl mx-auto w-full">
-        {/* Top Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
-          <div>
-            <h1 className="font-serif text-4xl md:text-5xl text-on-surface mb-2">Clinical Overview</h1>
-            <p className="text-on-surface-variant font-medium">Monitoring clinic performance for Oct 22, 2024.</p>
+    <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row font-sans text-slate-900">
+      {/* SHARED PREMIUM SIDEBAR (PATIENT VERSION) */}
+      <aside className={`fixed inset-y-0 left-0 w-80 bg-white border-r border-slate-100 flex flex-col z-50 transition-all duration-500 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}`}>
+        <div className="p-10 flex flex-col grow">
+          <div className="flex justify-between items-center mb-12">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200"><Sparkles size={20} /></div>
+              <span className="text-2xl font-serif font-black tracking-tighter text-slate-900 uppercase">SERENE</span>
+            </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-400 hover:text-slate-900"><X size={24} /></button>
           </div>
-          
-          <div className="flex items-center gap-6">
-            <div className="relative hidden lg:block">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-outline" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search schedule..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 pr-6 py-3 rounded-2xl border border-outline-variant bg-white outline-none focus:border-primary transition-all shadow-sm"
-              />
-            </div>
-            <div className="flex items-center gap-4 bg-white p-2 rounded-full border border-outline-variant shadow-sm pr-6">
-              <div className="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden relative">
-                <Image src="/images/hero.png" alt="Admin" fill className="object-cover grayscale" sizes="40px" />
-              </div>
-              <div className="hidden sm:block">
-                <p className="text-xs font-bold text-on-surface">Dr. Elena Rossi</p>
-                <p className="text-[10px] uppercase tracking-widest text-primary font-bold">Lead Admin</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Stats Strip */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <StatCard icon={<CheckCircle />} label="Daily Revenue" value="$8,420" sub="+12% from yesterday" />
-          <StatCard icon={<RefreshCw />} label="Room Utilization" value="84%" sub="4 of 5 suites active" />
-          <StatCard icon={<AlertCircle />} label="Stock Alerts" value={alerts.length.toString()} sub="Critical supplies low" />
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
-          {/* Schedule */}
-          <section className="xl:col-span-8">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="font-serif text-2xl text-on-surface">Today's Schedule</h2>
-              <button className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                Full Calendar <ArrowRight size={14} />
-              </button>
-            </div>
+          <nav className="space-y-1.5 mb-10">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-300 mb-4 px-4">My Journey</p>
+            <Link href="/dashboard"><NavItem icon={<LayoutDashboard size={20} />} label="My Portal" active={pathname === '/dashboard'} /></Link>
+            <Link href="/booking"><NavItem icon={<Calendar size={20} />} label="New Booking" active={pathname === '/booking'} /></Link>
+            <Link href="/specialist"><NavItem icon={<HeartPulse size={20} />} label="Clinical Experts" active={pathname === '/specialist'} /></Link>
             
-            <div className="space-y-4">
-              <AnimatePresence>
-                {filteredAppointments.map((apt) => (
-                  <motion.div 
-                    key={apt.id}
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="glass-panel p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-6 border border-outline-variant/30 hover:shadow-premium transition-all group"
-                  >
-                    <div className="flex items-center gap-6">
-                      <div className="text-center min-w-[80px]">
-                        <p className="text-xl font-serif text-on-surface">{apt.time.split(' ')[0]}</p>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{apt.time.split(' ')[1]}</p>
-                      </div>
-                      <div className="w-px h-12 bg-outline-variant/30 hidden sm:block" />
-                      <div>
-                        <h4 className="font-bold text-on-surface text-lg">{apt.patient}</h4>
-                        <p className="text-sm text-on-surface-variant font-medium">{apt.service} • {apt.room}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-6">
-                       <select 
-                        value={apt.status}
-                        onChange={(e) => updateStatus(apt.id, e.target.value)}
-                        className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border-none outline-none cursor-pointer ${
-                          apt.status === 'Checked In' ? 'bg-primary text-white' : 
-                          apt.status === 'In Progress' ? 'bg-tertiary text-white' : 
-                          'bg-surface-variant text-on-surface-variant'
-                        }`}
-                       >
-                         <option>Upcoming</option>
-                         <option>Checked In</option>
-                         <option>In Progress</option>
-                         <option>Completed</option>
-                       </select>
-                       <button className="p-2 text-outline-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
-                         <MoreVertical size={20} />
-                       </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              
-              {filteredAppointments.length === 0 && (
-                <div className="py-20 text-center glass-panel rounded-3xl border border-dashed border-outline-variant">
-                   <p className="text-on-surface-variant font-medium italic">No appointments match your search.</p>
+            <Link href="/complete-profile"><NavItem icon={<Droplets size={20} />} label="Skin Analysis" active={pathname === '/complete-profile'} /></Link>
+
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-300 mt-10 mb-4 px-4">Navigation</p>
+            <Link href="/"><NavItem icon={<ArrowUpRight size={20} />} label="Back to Website" active={false} /></Link>
+          </nav>
+
+          <div className="mt-auto">
+             <div className="bg-slate-50 p-6 rounded-4xl mb-8 group cursor-pointer hover:bg-slate-900 transition-all duration-500">
+                <div className="flex items-center gap-4">
+                   <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-900 group-hover:bg-slate-800 group-hover:text-white group-hover:border-transparent transition-all">{profile?.full_name?.[0]}</div>
+                   <div>
+                      <p className="text-xs font-black text-slate-900 group-hover:text-white transition-colors uppercase tracking-widest truncate max-w-[120px]">{profile?.full_name}</p>
+                      <p className="text-[10px] font-bold text-slate-400 group-hover:text-slate-500 transition-colors uppercase tracking-widest">{profile?.member_status} Member</p>
+                   </div>
                 </div>
-              )}
-            </div>
-          </section>
-
-          {/* Sidebar: Alerts & Tasks */}
-          <aside className="xl:col-span-4 space-y-12">
-            <div>
-              <h2 className="font-serif text-2xl text-on-surface mb-8">Clinical Alerts</h2>
-              <div className="space-y-4">
-                <AnimatePresence>
-                  {alerts.map((alert) => (
-                    <motion.div 
-                      key={alert.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className={`p-6 rounded-3xl border ${alert.priority === 'High' ? 'bg-error/5 border-error/20' : 'bg-primary/5 border-primary/20'} relative group`}
-                    >
-                      <button 
-                        onClick={() => dismissAlert(alert.id)}
-                        className="absolute top-4 right-4 text-outline-variant hover:text-on-surface opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X size={16} />
-                      </button>
-                      <div className="flex gap-4 items-start">
-                        <div className={`mt-1 ${alert.priority === 'High' ? 'text-error' : 'text-primary'}`}>
-                          {alert.type === 'inventory' ? <Syringe size={20} /> : <ShieldCheck size={20} />}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-on-surface text-sm mb-1">{alert.title}</h4>
-                          <p className="text-xs text-on-surface-variant leading-relaxed font-medium">{alert.desc}</p>
-                          <button className={`mt-4 text-[10px] font-bold uppercase tracking-widest ${alert.priority === 'High' ? 'text-error' : 'text-primary'} hover:underline`}>
-                            {alert.type === 'inventory' ? 'Order Supplies' : 'Resolve Task'}
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                
-                {alerts.length === 0 && (
-                  <div className="p-8 text-center bg-primary/5 rounded-3xl border border-dashed border-primary/20">
-                     <CheckCircle className="mx-auto text-primary mb-3" size={32} />
-                     <p className="text-sm font-bold text-primary uppercase tracking-widest">All Clear</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="glass-panel p-8 rounded-4xl border border-outline-variant/30">
-               <div className="flex items-center gap-3 mb-6 text-primary">
-                 <Stethoscope size={20} />
-                 <h3 className="font-bold text-sm uppercase tracking-widest">EMR Audit Path</h3>
-               </div>
-               <p className="text-sm text-on-surface-variant font-medium leading-relaxed mb-6">
-                 Routine system audit scheduled for 11:00 PM. No manual action required.
-               </p>
-               <div className="w-full h-2 bg-outline-variant/20 rounded-full overflow-hidden">
-                 <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: "65%" }}
-                  className="h-full bg-primary"
-                 />
-               </div>
-            </div>
-          </aside>
+             </div>
+             <button onClick={async () => { await supabase.auth.signOut(); router.push("/login"); }} className="w-full flex items-center justify-between px-6 py-4 rounded-2xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all text-[10px] font-black uppercase tracking-[0.2em]">
+                Logout Portal <LogOut size={16} />
+             </button>
+          </div>
         </div>
+      </aside>
+
+      <main className="flex-1 p-6 lg:p-16 lg:ml-80 transition-all duration-500">
+        <header className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="space-y-2">
+               <h1 className="font-serif text-5xl lg:text-6xl text-slate-900 tracking-tighter">Welcome Back, {profile?.full_name?.split(' ')[0]}</h1>
+               <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.25em]">{profile?.member_status} Status Verified</p>
+               </div>
+            </div>
+            <div className="flex gap-4">
+               <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-4 bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-900"><Activity size={20}/></button>
+               <Link href="/booking" className="bg-slate-900 text-white px-10 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">
+                  <Plus size={18} /> Schedule Treatment
+               </Link>
+            </div>
+        </header>
+
+        {/* KPI GRID - EXECUTIVE STYLE */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+           <StatCard label="Member Identity" value={profile?.member_id || `SRN-${profile?.id.slice(0,4).toUpperCase()}`} sub="Unique Clinical ID" icon={<Award className="text-amber-500"/>} color="bg-amber-50" />
+           <StatCard label="Clinical Profile" value={profile?.skin_type || "Awaiting Scan"} sub="Analysis Status" icon={<Droplets className="text-blue-500"/>} color="bg-blue-50" />
+           <StatCard label="Current Status" value={profile?.member_status || "Basic"} sub="Membership Tier" icon={<Sparkles className="text-violet-500"/>} color="bg-violet-50" />
+        </div>
+
+        {profile?.skin_type === null && (
+           <Link href="/complete-profile">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-16 p-10 bg-amber-50 border border-amber-100 rounded-[40px] flex flex-col md:flex-row items-center justify-between gap-8 group cursor-pointer hover:bg-amber-100 transition-all">
+                 <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-amber-500 shadow-sm"><AlertCircle size={28}/></div>
+                    <div>
+                       <h3 className="font-serif text-xl text-amber-900 mb-1">Incomplete Medical Data</h3>
+                       <p className="text-xs font-bold text-amber-700/60 uppercase tracking-widest">Complete your skin analysis for personalized treatment plans</p>
+                    </div>
+                 </div>
+                 <ChevronRight className="text-amber-400 group-hover:translate-x-2 transition-transform" size={24}/>
+              </motion.div>
+           </Link>
+        )}
+
+        <div className="space-y-8">
+           <div className="flex items-center justify-between mb-2">
+              <h3 className="font-serif text-3xl text-slate-900">Treatment History</h3>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Secure Records</p>
+           </div>
+
+           <div className="bg-white rounded-4xl lg:rounded-5xl border border-slate-100 shadow-sm overflow-hidden">
+              {/* MOBILE CARD VIEW */}
+              <div className="block lg:hidden divide-y divide-slate-50">
+                 {appointments.map((appt) => (
+                    <div key={appt.id} className="p-8 space-y-6">
+                       <div className="flex justify-between items-start">
+                          <div>
+                             <p className="text-xs font-black text-slate-300 uppercase tracking-widest mb-1">{appt.appointment_date}</p>
+                             <h4 className="text-lg font-black text-slate-900">{appt.services?.name}</h4>
+                          </div>
+                          <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${getStatusColor(appt.status)}`}>{appt.status}</span>
+                       </div>
+                       <div className="flex items-center justify-between pt-2">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Specialist: <span className="text-slate-900">{appt.specialists?.name}</span></p>
+                          {appt.status === 'completed' && !appt.rating && (
+                             <button onClick={() => setSelectedAppt(appt)} className="text-primary font-black text-[9px] uppercase tracking-widest border-b-2 border-primary border-dotted pb-0.5">Rate Session</button>
+                          )}
+                       </div>
+                    </div>
+                 ))}
+              </div>
+
+              {/* DESKTOP TABLE VIEW */}
+              <div className="hidden lg:block overflow-x-auto">
+                 <table className="w-full text-left">
+                    <thead>
+                       <tr className="bg-slate-50/50 border-b border-slate-100">
+                          <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Date & Session</th>
+                          <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Status</th>
+                          <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Clinical Expert</th>
+                          <th className="px-10 py-8 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 text-right">Feedback</th>
+                       </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                       {appointments.map((appt) => (
+                          <tr key={appt.id} className="hover:bg-slate-50/30 transition-colors">
+                             <td className="px-10 py-8">
+                                <p className="text-sm font-black text-slate-900 mb-1">{appt.services?.name}</p>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{appt.appointment_date} • {appt.appointment_time}</p>
+                             </td>
+                             <td className="px-10 py-8">
+                                <span className={`px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${getStatusColor(appt.status)}`}>{appt.status}</span>
+                             </td>
+                             <td className="px-10 py-8 text-sm font-bold text-slate-500">{appt.specialists?.name}</td>
+                             <td className="px-10 py-8 text-right">
+                                {appt.status === 'completed' && !appt.rating ? (
+                                   <button onClick={() => setSelectedAppt(appt)} className="bg-slate-900 text-white px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">Submit Feedback</button>
+                                ) : (
+                                   <div className="flex justify-end gap-1 text-amber-500">
+                                      {[...Array(5)].map((_, i) => <Star key={i} size={14} fill={i < (appt.rating || 0) ? "currentColor" : "none"} />)}
+                                   </div>
+                                )}
+                             </td>
+                          </tr>
+                       ))}
+                    </tbody>
+                 </table>
+              </div>
+           </div>
+        </div>
+
+        {/* FEEDBACK MODAL */}
+        <AnimatePresence>
+           {selectedAppt && (
+              <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedAppt(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
+                 <motion.div initial={{ opacity: 0, y: 100, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 100, scale: 0.9 }} className="relative w-full max-w-xl bg-white rounded-5xl lg:rounded-[64px] shadow-2xl p-10 lg:p-16 overflow-hidden">
+                    <div className="text-center mb-12">
+                       <div className="w-16 h-16 bg-amber-50 rounded-3xl flex items-center justify-center text-amber-500 mx-auto mb-6 shadow-sm"><Star size={32} fill="currentColor"/></div>
+                       <h2 className="font-serif text-4xl mb-2 text-slate-900 tracking-tight">Rate Your Experience</h2>
+                       <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.25em]">Session with {selectedAppt.specialists?.name}</p>
+                    </div>
+
+                    <div className="flex justify-center gap-3 mb-10">
+                       {[1, 2, 3, 4, 5].map(s => (
+                          <button key={s} onClick={() => setRating(s)} className={`w-14 h-14 lg:w-16 lg:h-16 rounded-[24px] transition-all flex items-center justify-center ${rating >= s ? "bg-amber-100 text-amber-500" : "bg-slate-50 text-slate-300"}`}><Star size={24} fill={rating >= s ? "currentColor" : "none"} /></button>
+                       ))}
+                    </div>
+
+                    <div className="space-y-4 mb-10">
+                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-4">Clinical Feedback (Optional)</p>
+                       <textarea value={feedback} onChange={(e) => setFeedback(e.target.value)} className="w-full h-32 p-8 rounded-[32px] border border-slate-100 bg-slate-50/50 outline-none focus:border-slate-900 focus:bg-white transition-all text-sm font-medium leading-relaxed" placeholder="Share your experience with the treatment..." />
+                    </div>
+
+                    <button onClick={submitRating} disabled={isSubmitting} className="w-full bg-slate-900 text-white py-6 rounded-[28px] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 shadow-2xl shadow-slate-200 active:scale-95 transition-all">
+                       {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <><Save size={18}/> Finalize Review</>}
+                    </button>
+                 </motion.div>
+              </div>
+           )}
+        </AnimatePresence>
       </main>
     </div>
   );
 }
 
-function StatCard({ icon, label, value, sub }) {
+function NavItem({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) {
   return (
-    <motion.div 
-      whileHover={{ y: -5 }}
-      className="glass-panel p-8 rounded-4xl border border-outline-variant/30 shadow-premium"
-    >
-      <div className="flex justify-between items-start mb-6">
-        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-          {icon}
-        </div>
+    <div className={`flex items-center gap-5 px-6 py-4 rounded-2xl transition-all duration-300 cursor-pointer group ${active ? "bg-slate-900 text-white shadow-2xl shadow-slate-200" : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"}`}>
+      <span className={active ? "text-white" : "text-slate-400 group-hover:text-slate-900 transition-colors"}>{icon}</span>
+      <span className="text-[11px] font-black uppercase tracking-[0.2em]">{label}</span>
+      {active && <motion.div layoutId="activeNav" className="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white]" />}
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub, icon, color }: any) {
+  return (
+    <div className="bg-white p-10 rounded-5xl border border-slate-100 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden">
+      <div className={`absolute top-0 right-0 w-32 h-32 rounded-bl-[100px] -mr-16 -mt-16 opacity-10 group-hover:opacity-20 transition-all duration-700 ${color}`} />
+      <div className="relative">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 ${color} shadow-sm`}>{icon}</div>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-2">{label}</p>
+        <h3 className="text-3xl font-serif text-slate-900 tracking-tighter mb-1">{value}</h3>
+        <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{sub}</p>
       </div>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">{label}</p>
-      <h3 className="text-4xl font-serif text-on-surface mb-2">{value}</h3>
-      <p className="text-xs font-bold text-primary">{sub}</p>
-    </motion.div>
+    </div>
   );
 }
